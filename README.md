@@ -4,6 +4,7 @@
 ## Pre-reqs
 
 ```
+apt-get install g++
 go 1.12.5 or +
 ```
 
@@ -12,6 +13,14 @@ go 1.12.5 or +
 ```
 go get github.com/gorilla/mux
 ```
+
+## Run all tests
+```
+go test -v ./handlers/
+```
+
+
+
 
 # Referencia
 

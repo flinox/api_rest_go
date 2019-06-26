@@ -31,13 +31,13 @@ func GetUserRoutes() *mux.Router {
 
 // GetAllUsers Get all users
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
-	defer utils.timeTrack(time.Now(), "GetAllUsers")
+	defer timeTrack(time.Now(), "GetAllUsers")
 	json.NewEncoder(w).Encode(users)
 }
 
 // GetUser Get specific user by id
 func GetUser(w http.ResponseWriter, r *http.Request) {
-	defer utils.timeTrack(time.Now(), "GetUser")
+	defer timeTrack(time.Now(), "GetUser")
 	params := mux.Vars(r)
 	for _, user := range users {
 		if user.ID == params["id"] {
@@ -50,7 +50,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 // CreateUser Create a user
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	defer utils.timeTrack(time.Now(), "CreateUser")
+	defer timeTrack(time.Now(), "CreateUser")
 	params := mux.Vars(r)
 	var user models.User
 	_ = json.NewDecoder(r.Body).Decode(&user)
@@ -61,7 +61,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 // DeleteUser Delete user
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	defer utils.timeTrack(time.Now(), "DeleteUser")
+	defer timeTrack(time.Now(), "DeleteUser")
 	params := mux.Vars(r)
 	for index, user := range users {
 		if user.ID == params["id"] {
