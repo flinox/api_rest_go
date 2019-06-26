@@ -4,42 +4,49 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
+	"time"
 
-	"github.com/flinox/api_rest_go/handlers"
+	"github.com/flinox/api_rest_go/routes"
+	"github.com/flinox/api_rest_go/utils"
 )
 
 var (
-	port       = os.Getenv("PORTA")
-	servicelog = true
+	port          = os.Getenv("PORTA")
+	servicelog, _ = strconv.ParseBool(os.Getenv("LOG"))
 )
 
 func init() {
+
+	// Auxiliar para gerar novos arquivos de API
+	utils.WriteHandlers("newhandler")
 
 	if port == "" {
 		os.Setenv("PORTA", "8000")
 		port = os.Getenv("PORTA")
 	}
 
-	if os.Getenv("LOG") == "" {
-		os.Setenv("LOG", strconv.FormatBool(servicelog))
-	}
-
-	// servicelog, err := strconv.ParseBool(os.Getenv("LOG"))
-
-	// if err == nil {
-	// 	/** displayg the type of the b variable */
-	// 	fmt.Printf("Type: %T \n", servicelog)
-
-	// 	/** displaying the string variable into the console */
-	// 	fmt.Println("Value:", servicelog)
-	// }
-
 }
 
 func main() {
+
 	log.Println("[START] Executando o serviço na porta", port)
-	log.Println("Log está ativo?", servicelog)
-	log.Fatal(http.ListenAndServe(":"+port, handlers.GetUserRoutes()))
-	log.Println("[STOP] Encerrand o serviço na porta", port)
+	log.Println(" [LOG]", servicelog)
+
+	var channel = make(chan os.Signal)
+	signal.Notify(channel, syscall.SIGTERM)
+	signal.Notify(channel, syscall.SIGINT)
+	go func() {
+		sig := <-channel
+		log.Println(" sig:", sig)
+		log.Println(" Aguarde enquanto o serviço está sendo finalizado...")
+		time.Sleep(2 * time.Second)
+		log.Println("[STOP] Encerrando o serviço na porta", port)
+		os.Exit(0)
+	}()
+
+	log.Fatal(http.ListenAndServe(":"+port, routes.GetUserRoutes()))
+
 }
