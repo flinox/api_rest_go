@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -16,21 +17,36 @@ import (
 var (
 	port          = os.Getenv("PORTA")
 	servicelog, _ = strconv.ParseBool(os.Getenv("LOG"))
+	execmode      = "service"
+	urnname       = ""
 )
 
 func init() {
-
-	// Auxiliar para gerar novos arquivos de API
-	utils.WriteHandlers("newhandler")
 
 	if port == "" {
 		os.Setenv("PORTA", "8000")
 		port = os.Getenv("PORTA")
 	}
 
+	flag.StringVar(&execmode, "execmode", "service", "Executar em modo service (production) ou genurn (generate urn/handlers)")
+	flag.StringVar(&urnname, "urn", "", "Se modo genurn deve ser informado o nome do urn que se quer gerar")
+
 }
 
 func main() {
+
+	flag.Parse()
+
+	if execmode == "genurn" {
+
+		if urnname == "" {
+			log.Println("URN não gerada, necessário informar o parametro -urn=<nome_urn>")
+			os.Exit(3)
+		}
+
+		utils.GenerateHandler(urnname)
+		os.Exit(2)
+	}
 
 	log.Println("[START] Executando o serviço na porta", port)
 	log.Println(" [LOG]", servicelog)
